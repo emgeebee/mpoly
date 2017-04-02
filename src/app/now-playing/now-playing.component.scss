@@ -1,0 +1,31 @@
+@import '~scss/variables.scss';
+
+:host {
+    margin: 0 20px;
+}
+a {
+    cursor: pointer;
+    display: inline-block;
+    flex-grow: 1;
+    &:hover {
+        background-color: $background-color-hover;
+    }
+}
+::ng-deep .meta {
+    font-size: 10px;
+}
+.wrapper {
+    position: relative;
+    background-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==);
+    background-repeat: no-repeat;
+    border: $border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    width: 300px;
+}
+.title {
+    position: absolute;
+    display: inline-block;
+}

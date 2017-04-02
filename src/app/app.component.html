@@ -1,0 +1,28 @@
+<div class="pageControl">
+    <a (click)="moveTo(0)" class="slider" [class.selected]="pageView === 0">
+        <icon class="folder"></icon>
+    </a>
+    <a (click)="moveTo(1)" class="slider" [class.selected]="pageView === 1">
+        <icon class="list"></icon>
+    </a>
+    <a (click)="moveTo(2)" class="slider" [class.selected]="pageView === 2">
+        <icon class="now-playing"></icon>
+    </a>
+</div>
+<div class="meta">
+    <state></state>
+    <now-playing></now-playing>
+    <controls></controls>
+</div>
+<div class="view" [style.transform]="'translateX(-'+offset+'vw)'">
+    <div class="frame">
+        <file-explorer></file-explorer>
+    </div>
+
+    <div class="frame">
+        <playlist></playlist>
+    </div>
+    <div class="frame">
+        <now-playing-detail></now-playing-detail>
+    </div>
+</div>

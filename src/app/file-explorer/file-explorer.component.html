@@ -1,0 +1,13 @@
+<div>current folder: {{mpdData.currentFolder}}</div>
+<ul class="list">
+    <li *ngIf="mpdData.currentFolder !== '/'">
+        <a target="_blank" rel="noopener" (click)="selectParent()">
+            <icon class="folder"></icon>
+            ..
+        </a>
+    </li>
+    <ng-container *ngFor="let item of mpdData.folderList">
+        <li *ngIf="item.directory"><folder [item]="item"></folder></li>
+        <li *ngIf="item.file"><file [item]="item"></file></li>
+    </ng-container>
+</ul>

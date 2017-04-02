@@ -1,0 +1,41 @@
+@import "../scss/variables";
+
+.view {
+    display: flex;
+    width: 270vw;
+    transition: transform 500ms ease;
+    padding-top: rowheight(3);
+
+    .frame {
+        width: 90vw;
+        &>*{
+            max-width: 800px;
+            display: block;
+            margin: 0 auto;
+        }
+    }
+}
+.pageControl {
+    display: flex;
+    justify-content: space-between;
+}
+.slider {
+    cursor: pointer;
+    display: block;
+    background-color: #F3F3F3;
+    text-align: center;
+    width: 98%;
+    padding: rowheight(3) 0;
+    &:hover {
+        background-color: #EEE;
+    }
+}
+.meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: rowheight(3);
+}
+.selected {
+    background-color: $background-color-playing;
+}

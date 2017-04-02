@@ -1,0 +1,32 @@
+@import '~scss/variables.scss';
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    border-bottom: $border;
+    margin: rowheight(1) 0;
+    font-family: $font-family;
+}
+
+a {
+    padding: rowheight(1) 10px;
+    background-color: $background-color;
+    display: block;
+    cursor: pointer;
+    &:hover {
+        background-color: $background-color-hover;
+    }
+    .now-playing & {
+        background-color: $background-color-playing;
+    }
+}
+::ng-deep .meta, .filepath {
+    font-size: 10px;
+}
+.actions {
+    margin-top: rowheight(2);
+}

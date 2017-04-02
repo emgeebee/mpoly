@@ -1,0 +1,18 @@
+<a rel="noopener" (click)="prev()">
+    <icon class="prev"></icon>
+</a>
+<a *ngIf="mpdData.state.state === 'stop'" rel="noopener" (click)="play()">
+    <icon class="play"></icon>
+</a>
+<a *ngIf="mpdData.state.state === 'pause'" rel="noopener" (click)="play()">
+    <icon class="play"></icon>
+</a>
+<a *ngIf="mpdData.state.state === 'play'" rel="noopener" (click)="pause()">
+    <icon class="pause"></icon>
+</a>
+<a *ngIf="mpdData.state.state === 'play'" rel="noopener" (click)="pause()">
+    <icon class="pause"></icon>
+</a>
+<a rel="noopener" (click)="next()">
+    <icon class="next"></icon>
+</a>

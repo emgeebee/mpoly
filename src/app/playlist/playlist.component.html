@@ -1,0 +1,15 @@
+<div>
+    <div class="actions">
+        <a rel="noopener" (click)="clear()">
+            <icon class="bin"></icon>
+        </a>
+    </div>
+    <ul class="list">
+        <li *ngFor="let item of mpdData.playlist" [class.now-playing]="item.nowPlaying">
+            <a rel="noopener" (click)="play(item.Pos)">
+                <p innerHTML="{{ item | trackName }}">
+                <p class="filepath" innerHTML="{{item.file}}"></p>
+            </a>
+        </li>
+    </ul>
+</div>

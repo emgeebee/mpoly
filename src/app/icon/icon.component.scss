@@ -1,0 +1,91 @@
+@import '~scss/variables.scss';
+
+div {
+    border: 1px solid transparent;
+    display: inline-block;
+    padding: rowheight(1);
+    &:active, &:hover {
+        background-color: transparent;
+        border: 1px solid $tint;
+    }
+}
+span {
+    display: inline-block;
+    height: rowheight(4);
+    width: rowheight(4);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    background-position: center;
+}
+.tint {
+    background-color: $tint
+    &:active, &:hover {
+        background-color: transparent;
+        border: 1px solid transparent;
+    }
+}
+
+.add {
+    background-image: url('assets/SVG/plus.svg');
+}
+
+.bin {
+    background-image: url('assets/SVG/bin.svg');
+}
+
+.connected {
+    background-image: url('assets/SVG/feed.svg');
+}
+
+.folder {
+    background-image: url('assets/SVG/folder-open.svg');
+}
+
+.list {
+    background-image: url('assets/SVG/file-text.svg');
+}
+
+.next {
+    background-image: url('assets/SVG/next2.svg');
+}
+
+.now-playing {
+    background-image: url('assets/SVG/play.svg');
+}
+
+.pause {
+    background-image: url('assets/SVG/pause2.svg');
+}
+
+.play {
+    background-image: url('assets/SVG/play3.svg');
+}
+
+.prev {
+    background-image: url('assets/SVG/previous2.svg');
+}
+
+.rescan {
+    background-image: url('assets/SVG/loop2.svg');
+}
+
+.scan-back {
+    background-image: url('assets/SVG/backward2.svg');
+}
+
+.scan-forward {
+    background-image: url('assets/SVG/forward3.svg');
+}
+
+.volume-down {
+    background-image: url('assets/SVG/volume-decrease.svg');
+}
+
+.volume-off {
+    background-image: url('assets/SVG/volume-mute2.svg');
+}
+
+.volume-up {
+    background-image: url('assets/SVG/volume-increase.svg');
+}

@@ -1,0 +1,11 @@
+<div>
+    <a target="_blank" rel="noopener" (click)="addDirectory(item)">
+        <icon class="add"></icon>
+    </a>
+    <a target="_blank" rel="noopener" (click)="playDirectory(item)">
+        <icon class="play"></icon>
+    </a>
+    <a target="_blank" rel="noopener">
+        {{item.file.split("/").slice(-1)[0]}}
+    </a>
+</div>
