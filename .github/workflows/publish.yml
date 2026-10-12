@@ -1,0 +1,75 @@
+name: Publish to NPM
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies (server)
+        run: |
+          cd server-new
+          npm ci
+
+      - name: Install dependencies (client)
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Prepare package for publishing
+        run: |
+          # Create dist directory structure
+          mkdir -p dist
+          
+          # Copy server files
+          cp -r server-new/* dist/
+          
+          # Copy built client to dist
+          mkdir -p dist/client
+          cp -r client/dist dist/client/
+          
+          # Copy essential files
+          cp README-NEW.md dist/README.md
+          cp LICENSE dist/ 2>/dev/null || echo "No LICENSE file"
+          
+          # Update package.json for publishing
+          node scripts/prepare-publish.js
+
+      - name: Publish to NPM
+        run: |
+          cd dist
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false

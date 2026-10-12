@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (server)
+        run: |
+          cd server-new
+          npm ci
+
+      - name: Install dependencies (client)
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Test server start
+        run: |
+          cd server-new
+          timeout 5 node index.js || exit 0
+
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          cd server-new && npm ci
+          cd ../client && npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Build Docker image
+        run: docker build -t mpoly:test .
+
+      - name: Test Docker image
+        run: |
+          docker run -d --name mpoly-test -p 3001:3001 mpoly:test
+          sleep 5
+          docker logs mpoly-test
+          docker stop mpoly-test

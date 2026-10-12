@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mpoly:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - MPD_HOST=${MPD_HOST:-localhost}
+      - MPD_PORT=${MPD_PORT:-6600}
+    restart: unless-stopped
+    networks:
+      - mpoly-network
+
+networks:
+  mpoly-network:
+    driver: bridge
