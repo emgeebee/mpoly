@@ -26,6 +26,9 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
       - name: Determine version and check npm
         id: version
         run: |
@@ -80,9 +83,7 @@ jobs:
         if: steps.version.outputs.publish == 'true'
         run: |
           cd dist
-          npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          npm publish --access public
 
       - name: Create GitHub Release
         if: steps.version.outputs.publish == 'true'
