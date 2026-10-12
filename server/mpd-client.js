@@ -6,18 +6,26 @@ export class MPDClient extends EventEmitter {
     super();
     this.socket = null;
     this.buffer = '';
+    this.partialLine = '';
     this.callbacks = [];
     this.isIdle = false;
     this.connected = false;
   }
 
-  connect(host = 'localhost', port = 6600) {
+  connect(host = 'localhost', port = 6600, timeoutMs = 5000) {
     return new Promise((resolve, reject) => {
+      let ready = false;
       this.socket = net.createConnection(port, host);
-      
+      this.socket.setTimeout(timeoutMs);
+
       this.socket.on('connect', () => {
         this.connected = true;
-        console.log(`Connected to MPD at ${host}:${port}`);
+      });
+
+      this.socket.on('timeout', () => {
+        if (!ready) {
+          this.socket.destroy(new Error(`timed out after ${timeoutMs}ms`));
+        }
       });
 
       this.socket.on('data', (data) => {
@@ -25,15 +33,21 @@ export class MPDClient extends EventEmitter {
       });
 
       this.socket.on('error', (err) => {
-        console.error('MPD connection error:', err);
         this.connected = false;
         reject(err);
       });
 
       this.socket.on('close', () => {
         this.connected = false;
-        this.emit('disconnected');
-        console.log('Disconnected from MPD');
+        this.isIdle = false;
+        this.buffer = '';
+        this.partialLine = '';
+        const pending = this.callbacks;
+        this.callbacks = [];
+        pending.forEach((callback) => callback(new Error('Connection to MPD closed')));
+        if (ready) {
+          this.emit('disconnected');
+        }
       });
 
       // Wait for the initial OK message
@@ -41,6 +55,8 @@ export class MPDClient extends EventEmitter {
         if (err) {
           reject(err);
         } else {
+          ready = true;
+          this.socket.setTimeout(0);
           this.emit('ready');
           resolve();
           this.startIdleMode();
@@ -51,8 +67,9 @@ export class MPDClient extends EventEmitter {
   }
 
   handleData(data) {
-    const lines = data.split('\n');
-    
+    const lines = (this.partialLine + data).split('\n');
+    this.partialLine = lines.pop();
+
     for (const line of lines) {
       if (line.startsWith('OK')) {
         this.flushBuffer(null);
@@ -110,12 +127,11 @@ export class MPDClient extends EventEmitter {
         return reject(new Error('Not connected to MPD'));
       }
 
-      // Exit idle mode if active
+      // Exit idle mode if active; MPD answers noidle with OK, which the
+      // pending idle callback consumes
       if (this.isIdle) {
         this.isIdle = false;
         this.socket.write('noidle\n');
-        // Consume the idle callback
-        this.callbacks.shift();
       }
 
       let commandStr = cmd;
@@ -149,8 +165,7 @@ export class MPDClient extends EventEmitter {
       this.isIdle = false;
       if (!err && data) {
         // Parse changed subsystem
-        const match = data.changed || (typeof data === 'string' && data.match(/changed:\s*(\w+)/));
-        const subsystem = match ? (match[1] || match) : null;
+        const subsystem = data.changed || null;
         if (subsystem) {
           this.emit('changed', subsystem);
         }
@@ -227,7 +242,8 @@ export class MPDClient extends EventEmitter {
 
   disconnect() {
     if (this.socket) {
-      this.socket.end();
+      this.removeAllListeners();
+      this.socket.destroy();
       this.socket = null;
     }
   }

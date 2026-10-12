@@ -47,7 +47,7 @@ function App() {
         if (message.type === 'initial' || message.type === 'update') {
           setState(message.data);
         } else if (message.type === 'disconnected') {
-          setState(prev => ({ ...prev, connected: false }));
+          setState(prev => ({ ...prev, ...message.data, connected: false }));
         }
       };
 
@@ -145,8 +145,13 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>MPoly</h1>
-        <div className={`status ${state.connected ? 'connected' : 'disconnected'}`}>
-          {state.connected ? '● Connected' : '○ Disconnected'}
+        <div
+          className={`status ${state.connected ? 'connected' : 'disconnected'}`}
+          title={state.error || ''}
+        >
+          {state.connected
+            ? '● Connected'
+            : `○ Waiting for MPD${state.mpd ? ` at ${state.mpd}` : ''}…`}
         </div>
       </header>
 
@@ -164,11 +169,11 @@ function App() {
 
         <div className="secondary-section">
           <Playlist 
-            playlist={state.playlist} 
+            playlist={state.playlist || []} 
             status={state.status}
             api={api}
           />
-          <Browser api={api} />
+          <Browser api={api} connected={state.connected} />
         </div>
       </div>
     </div>

@@ -7,7 +7,8 @@
 #   - MPD on another machine: its IP or hostname, e.g. 192.168.1.50
 #   - MPD on the NAS itself: host.docker.internal (mapped below)
 #
-# To upgrade, bump the version in the npx line and rebuild the project.
+# Tracks @latest: the container restarts mpoly every MPOLY_REFRESH_HOURS
+# and npx fetches the newest published version.
 
 version: "3.8"
 
@@ -16,17 +17,27 @@ services:
     image: node:22-alpine
     restart: unless-stopped
     ports:
-      # Host port (left) — override if 3001 is taken, e.g. UI_PORT=3002 docker compose up
-      - "${UI_PORT:-3001}:3001"
+      # Host port (left) — change if 3791 is taken
+      - "3791:3001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      MPD_HOST: "host.docker.internal"
+      MPD_HOST: "192.168.2.188"
       MPD_PORT: "6600"
       PORT: "3001"
+      # Restart every N hours to pick up new @latest releases
+      MPOLY_REFRESH_HOURS: "3"
     command:
       - /bin/sh
       - -c
       - |
-        rm -rf /root/.npm/_npx 2>/dev/null || true
-        exec npx --yes @emgeebee/mpoly@2.1.0
+        REFRESH=$(($${MPOLY_REFRESH_HOURS:-3} * 3600))
+        while true; do
+          echo "[mpoly] starting $$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          rm -rf /root/.npm/_npx 2>/dev/null || true
+          npx --yes --prefer-online @emgeebee/mpoly@latest &
+          PID=$$!
+          ( sleep $$REFRESH; kill $$PID 2>/dev/null || true ) &
+          wait $$PID 2>/dev/null || true
+          sleep 2
+        done

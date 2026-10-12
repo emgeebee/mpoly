@@ -46,10 +46,12 @@ See [`docker/synology-compose.yml`](docker/synology-compose.yml). In Container M
 The container runs:
 
 ```bash
-npx --yes @emgeebee/mpoly@2.1.0
+npx --yes --prefer-online @emgeebee/mpoly@latest
 ```
 
-To upgrade, change the version in the compose file and rebuild the project.
+It restarts every `MPOLY_REFRESH_HOURS` (default 3) to pick up new releases.
+
+If MPD is down, mpoly keeps running: the UI shows "Waiting for MPD", commands return `503`, and it reconnects automatically (backing off up to 30s between attempts).
 
 ### Docker (build from source)
 

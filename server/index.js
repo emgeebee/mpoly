@@ -29,63 +29,81 @@ if (clientBuildPath) {
   app.use(express.static(clientBuildPath));
 }
 
+const MPD_ADDRESS = `${MPD_HOST}:${MPD_PORT}`;
+const RECONNECT_MIN_MS = 2000;
+const RECONNECT_MAX_MS = 30000;
+
 // MPD client instance
 let mpdClient = null;
-let reconnectInterval = null;
+let reconnectTimer = null;
+let reconnectDelay = RECONNECT_MIN_MS;
+let lastConnectError = null;
 
-// Connect to MPD
+function isMPDConnected() {
+  return Boolean(mpdClient && mpdClient.connected);
+}
+
+function disconnectedState() {
+  return {
+    connected: false,
+    mpd: MPD_ADDRESS,
+    error: lastConnectError,
+    status: {},
+    currentSong: {},
+    playlist: []
+  };
+}
+
+// Connect to MPD. Failures are logged once per outage, then retried quietly
+// with backoff until MPD is back.
 async function connectToMPD() {
+  reconnectTimer = null;
+  const client = new MPDClient();
+
   try {
-    mpdClient = new MPDClient();
-    await mpdClient.connect(MPD_HOST, MPD_PORT);
-    
-    // Broadcast to all WebSocket clients when MPD state changes
-    mpdClient.on('changed', async (subsystem) => {
-      console.log(`MPD changed: ${subsystem}`);
-      
-      // Broadcast the change to all connected clients
-      const data = await getFullState();
-      broadcast({ type: 'update', subsystem, data });
-    });
-
-    mpdClient.on('disconnected', () => {
-      console.log('MPD disconnected, will try to reconnect...');
-      broadcast({ type: 'disconnected' });
-      scheduleReconnect();
-    });
-
-    // Clear any existing reconnect interval
-    if (reconnectInterval) {
-      clearInterval(reconnectInterval);
-      reconnectInterval = null;
-    }
-
-    console.log('MPD client initialized');
-    return true;
+    await client.connect(MPD_HOST, MPD_PORT);
   } catch (error) {
-    console.error('Failed to connect to MPD:', error.message);
+    client.disconnect();
+    if (lastConnectError !== error.message) {
+      console.warn(`MPD unavailable at ${MPD_ADDRESS} (${error.message}); retrying in the background`);
+      lastConnectError = error.message;
+    }
     scheduleReconnect();
-    return false;
+    return;
   }
+
+  mpdClient = client;
+  lastConnectError = null;
+  reconnectDelay = RECONNECT_MIN_MS;
+  console.log(`Connected to MPD at ${MPD_ADDRESS}`);
+
+  client.on('changed', async (subsystem) => {
+    const data = await getFullState();
+    broadcast({ type: 'update', subsystem, data });
+  });
+
+  client.on('disconnected', () => {
+    if (mpdClient !== client) return;
+    mpdClient = null;
+    lastConnectError = 'connection lost';
+    console.warn(`Lost connection to MPD at ${MPD_ADDRESS}; retrying in the background`);
+    broadcast({ type: 'disconnected', data: disconnectedState() });
+    scheduleReconnect();
+  });
+
+  broadcast({ type: 'update', subsystem: 'connection', data: await getFullState() });
 }
 
 function scheduleReconnect() {
-  if (!reconnectInterval) {
-    reconnectInterval = setInterval(async () => {
-      console.log('Attempting to reconnect to MPD...');
-      const connected = await connectToMPD();
-      if (connected && reconnectInterval) {
-        clearInterval(reconnectInterval);
-        reconnectInterval = null;
-      }
-    }, 5000);
-  }
+  if (reconnectTimer) return;
+  reconnectTimer = setTimeout(connectToMPD, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX_MS);
 }
 
 // Get full MPD state
 async function getFullState() {
-  if (!mpdClient || !mpdClient.connected) {
-    return { connected: false };
+  if (!isMPDConnected()) {
+    return disconnectedState();
   }
 
   try {
@@ -99,22 +117,42 @@ async function getFullState() {
       connected: true,
       status,
       currentSong,
-      playlist: Array.isArray(playlist) ? playlist : (playlist ? [playlist] : [])
+      playlist: toList(playlist)
     };
   } catch (error) {
-    console.error('Error getting MPD state:', error);
-    return { connected: false, error: error.message };
+    if (!isMPDConnected()) {
+      return disconnectedState();
+    }
+    console.error('Error getting MPD state:', error.message);
+    return { ...disconnectedState(), connected: true, error: error.message };
   }
 }
 
+// MPD returns a single object for one-item results and {} for none
+function toList(result) {
+  if (Array.isArray(result)) return result;
+  return result && Object.keys(result).length > 0 ? [result] : [];
+}
+
 // REST API Endpoints
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/status' || isMPDConnected()) {
+    return next();
+  }
+  res.status(503).json({ error: `MPD unavailable at ${MPD_ADDRESS}` });
+});
+
+function sendError(res, error) {
+  res.status(isMPDConnected() ? 500 : 503).json({ error: error.message });
+}
 
 app.get('/api/status', async (req, res) => {
   try {
     const state = await getFullState();
     res.json(state);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -124,7 +162,7 @@ app.post('/api/play', async (req, res) => {
     await mpdClient.play(pos);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -133,7 +171,7 @@ app.post('/api/pause', async (req, res) => {
     await mpdClient.pause();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -142,7 +180,7 @@ app.post('/api/stop', async (req, res) => {
     await mpdClient.stop();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -151,7 +189,7 @@ app.post('/api/next', async (req, res) => {
     await mpdClient.next();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -160,7 +198,7 @@ app.post('/api/previous', async (req, res) => {
     await mpdClient.previous();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -169,7 +207,7 @@ app.post('/api/clear', async (req, res) => {
     await mpdClient.clear();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -179,7 +217,7 @@ app.post('/api/add', async (req, res) => {
     await mpdClient.add(uri);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -189,7 +227,7 @@ app.post('/api/delete', async (req, res) => {
     await mpdClient.delete(pos);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -197,9 +235,9 @@ app.get('/api/browse', async (req, res) => {
   try {
     const { path = '' } = req.query;
     const items = await mpdClient.lsinfo(path);
-    res.json({ items: Array.isArray(items) ? items : (items ? [items] : []) });
+    res.json({ items: toList(items) });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -208,7 +246,7 @@ app.post('/api/update', async (req, res) => {
     await mpdClient.update();
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -218,7 +256,7 @@ app.post('/api/volume', async (req, res) => {
     await mpdClient.setVolume(volume);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -228,7 +266,7 @@ app.post('/api/seek', async (req, res) => {
     await mpdClient.seek(pos, time);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -265,7 +303,9 @@ wss.on('connection', async (ws) => {
 
   // Send initial state
   const state = await getFullState();
-  ws.send(JSON.stringify({ type: 'initial', data: state }));
+  if (ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'initial', data: state }));
+  }
 
   ws.on('close', () => {
     console.log('WebSocket client disconnected');
@@ -281,6 +321,7 @@ wss.on('connection', async (ws) => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
+  clearTimeout(reconnectTimer);
   if (mpdClient) {
     mpdClient.disconnect();
   }

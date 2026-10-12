@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './Browser.css';
 
-function Browser({ api }) {
+function Browser({ api, connected }) {
   const [currentPath, setCurrentPath] = useState('');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadPath(currentPath);
-  }, [currentPath]);
+    if (connected) {
+      loadPath(currentPath);
+    } else {
+      setItems([]);
+    }
+  }, [currentPath, connected]);
 
   const loadPath = async (path) => {
     setLoading(true);
@@ -62,7 +66,9 @@ function Browser({ api }) {
       </div>
 
       <div className="browser-items">
-        {loading ? (
+        {!connected ? (
+          <div className="empty">Library unavailable while MPD is offline</div>
+        ) : loading ? (
           <div className="loading">Loading...</div>
         ) : items.length === 0 ? (
           <div className="empty">No items found</div>
