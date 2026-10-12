@@ -31,8 +31,8 @@ jobs:
         run: |
           VERSION=$(node -p "require('./server-new/package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if npm view "mpoly@$VERSION" version >/dev/null 2>&1; then
-            echo "mpoly@$VERSION is already published; skipping."
+          if npm view "@emgeebee/mpoly@$VERSION" version >/dev/null 2>&1; then
+            echo "@emgeebee/mpoly@$VERSION is already published; skipping."
             echo "publish=false" >> "$GITHUB_OUTPUT"
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
