@@ -16,7 +16,7 @@ const serverPkg = JSON.parse(fs.readFileSync(serverPkgPath, 'utf8'));
 
 // Create the publishable package.json
 const publishPkg = {
-  name: 'mpoly',
+  name: '@emgeebee/mpoly',
   version: serverPkg.version || '2.0.0',
   description: 'Modern MPD (Music Player Daemon) client with Node.js server and React SPA - Winamp-inspired UI',
   main: 'index.js',

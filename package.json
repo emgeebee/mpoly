@@ -1,5 +1,5 @@
 {
-  "name": "mpoly",
+  "name": "@emgeebee/mpoly",
   "version": "2.0.0",
   "description": "Modern MPD client with Node.js server and React SPA",
   "scripts": {
