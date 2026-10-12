@@ -1,0 +1,53 @@
+.now-playing {
+  background: #252525;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.now-playing-info {
+  margin-bottom: 1.5rem;
+}
+
+.track-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #00d9ff;
+}
+
+.track-artist {
+  font-size: 1.2rem;
+  color: #bbbbbb;
+  margin-bottom: 0.25rem;
+}
+
+.track-album {
+  font-size: 1rem;
+  color: #888888;
+}
+
+.progress-container {
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  background: #444;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d9ff, #00ff88);
+  transition: width 0.3s ease;
+}
+
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #888;
+}

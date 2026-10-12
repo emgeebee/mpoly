@@ -1,0 +1,114 @@
+.browser {
+  background: #252525;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+}
+
+.browser-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #333;
+}
+
+.browser-header h2 {
+  font-size: 1.5rem;
+  color: #00d9ff;
+  margin-bottom: 0.75rem;
+}
+
+.browser-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.browser-nav button {
+  padding: 0.5rem 1rem;
+  background: #333;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.browser-nav button:hover:not(:disabled) {
+  background: #444;
+}
+
+.browser-path {
+  padding: 0.75rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-family: monospace;
+  color: #00ff88;
+}
+
+.browser-items {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.browser-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.browser-items::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.browser-items::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.browser-items::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+.browser-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.browser-item:hover {
+  background: #333;
+  transform: translateX(4px);
+}
+
+.browser-item.directory {
+  border-left: 3px solid #00d9ff;
+}
+
+.browser-item.file {
+  border-left: 3px solid #00ff88;
+}
+
+.item-icon {
+  font-size: 1.5rem;
+}
+
+.item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
