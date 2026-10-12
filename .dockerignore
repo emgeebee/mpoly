@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+README.md
+MIGRATION.md
+PUBLISHING.md
+.vscode
+.idea
+*.log
+.DS_Store
+.github
+dist
+client/node_modules
+server-new/node_modules

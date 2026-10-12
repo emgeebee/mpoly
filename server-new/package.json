@@ -1,6 +1,6 @@
 {
   "name": "mpoly-server",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "MPD control server",
   "main": "index.js",
   "type": "module",
@@ -12,5 +12,8 @@
     "express": "^4.18.2",
     "ws": "^8.14.2",
     "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -22,6 +22,33 @@ A modern Music Player Daemon (MPD) client with a Node.js backend and React front
 - Node.js 18+ (or Docker)
 - Running MPD server
 
+## Installation
+
+### From NPM (Easiest)
+
+```bash
+# Run directly with npx (no installation needed)
+npx mpoly
+
+# Or install globally
+npm install -g mpoly
+mpoly
+
+# Or install in a project
+npm install mpoly
+```
+
+Set environment variables for MPD connection:
+```bash
+MPD_HOST=localhost MPD_PORT=6600 npx mpoly
+```
+
+The server will start on http://localhost:3001 with the web interface.
+
+### From Source
+
+Clone and build from source for development.
+
 ## Quick Start
 
 ### Development
@@ -136,18 +163,25 @@ Messages:
 └── package.json         # Root package for scripts
 ```
 
-## Running with npx (Docker-style)
+## Running with npx
 
-To run the server directly with npx:
+Once published to npm, users can run directly:
+
+```bash
+npx mpoly
+```
+
+Or during development:
 
 ```bash
 cd server-new
-npx . # or: node index.js
+node index.js
 ```
 
 The server will:
 - Connect to MPD at the configured host/port
 - Start REST API on port 3001
+- Serve the web interface
 - Enable WebSocket for real-time updates
 - Auto-reconnect to MPD if disconnected
 
