@@ -4,9 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Keep package-lock.json for new architecture
-!server-new/package-lock.json
-!client/package-lock.json
+# Ignore old package-lock.json (but keep new ones)
+/package-lock.json
 
 # Build outputs
 dist/

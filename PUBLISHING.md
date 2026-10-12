@@ -88,15 +88,15 @@ Users can install and run:
 
 ```bash
 # Run directly with npx
-npx mpoly
+npx @emgeebee/mpoly
 
 # Or install globally
-npm install -g mpoly
+npm install -g @emgeebee/mpoly
 mpoly
 
 # Or install locally
-npm install mpoly
-node node_modules/mpoly/index.js
+npm install @emgeebee/mpoly
+node node_modules/@emgeebee/mpoly/index.js
 ```
 
 ## Environment Variables
@@ -104,7 +104,7 @@ node node_modules/mpoly/index.js
 Users can configure via environment variables:
 
 ```bash
-MPD_HOST=192.168.1.100 MPD_PORT=6600 PORT=8080 npx mpoly
+MPD_HOST=192.168.1.100 MPD_PORT=6600 PORT=8080 npx @emgeebee/mpoly
 ```
 
 ## Version Numbering
@@ -149,7 +149,8 @@ node index.js
 ### "403 Forbidden" Error
 
 - Check NPM_TOKEN in GitHub secrets
-- Verify npm account has publishing permissions
+- Verify npm account has publishing permissions for @emgeebee scope
+- Ensure you're a member of the @emgeebee organization on npm
 - Check package name isn't taken
 
 ### "EPUBLISHCONFLICT" Error
@@ -183,17 +184,18 @@ The GitHub Actions workflows:
 ## Package Info
 
 Published package info:
-- **Name**: `mpoly`
-- **Registry**: https://www.npmjs.com/package/mpoly
+- **Name**: `@emgeebee/mpoly`
+- **Registry**: https://www.npmjs.com/package/@emgeebee/mpoly
 - **Executable**: `mpoly` (via bin)
 - **Type**: ESM module
+- **Scope**: `@emgeebee`
 
 ## Unpublishing
 
 To unpublish (within 72 hours):
 
 ```bash
-npm unpublish mpoly@2.0.1
+npm unpublish @emgeebee/mpoly@2.0.1
 ```
 
 After 72 hours, contact npm support.

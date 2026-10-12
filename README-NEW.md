@@ -28,19 +28,19 @@ A modern Music Player Daemon (MPD) client with a Node.js backend and React front
 
 ```bash
 # Run directly with npx (no installation needed)
-npx mpoly
+npx @emgeebee/mpoly
 
 # Or install globally
-npm install -g mpoly
+npm install -g @emgeebee/mpoly
 mpoly
 
 # Or install in a project
-npm install mpoly
+npm install @emgeebee/mpoly
 ```
 
 Set environment variables for MPD connection:
 ```bash
-MPD_HOST=localhost MPD_PORT=6600 npx mpoly
+MPD_HOST=localhost MPD_PORT=6600 npx @emgeebee/mpoly
 ```
 
 The server will start on http://localhost:3001 with the web interface.
@@ -168,7 +168,7 @@ Messages:
 Once published to npm, users can run directly:
 
 ```bash
-npx mpoly
+npx @emgeebee/mpoly
 ```
 
 Or during development:
