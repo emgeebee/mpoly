@@ -2,17 +2,20 @@ name: Publish to NPM
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ master ]
   workflow_dispatch:
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,22 +26,38 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Determine version and check npm
+        id: version
+        run: |
+          VERSION=$(node -p "require('./server-new/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if npm view "mpoly@$VERSION" version >/dev/null 2>&1; then
+            echo "mpoly@$VERSION is already published; skipping."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies (server)
+        if: steps.version.outputs.publish == 'true'
         run: |
           cd server-new
           npm ci
 
       - name: Install dependencies (client)
+        if: steps.version.outputs.publish == 'true'
         run: |
           cd client
           npm ci
 
       - name: Build client
+        if: steps.version.outputs.publish == 'true'
         run: |
           cd client
           npm run build
 
       - name: Prepare package for publishing
+        if: steps.version.outputs.publish == 'true'
         run: |
           # Create dist directory structure
           mkdir -p dist
@@ -58,6 +77,7 @@ jobs:
           node scripts/prepare-publish.js
 
       - name: Publish to NPM
+        if: steps.version.outputs.publish == 'true'
         run: |
           cd dist
           npm publish --provenance --access public
@@ -65,11 +85,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --target "${{ github.sha }}" \
+            --title "Release v${{ steps.version.outputs.version }}" \
+            --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

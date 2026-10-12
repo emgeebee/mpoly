@@ -25,13 +25,12 @@ This document explains how to publish MPoly to npm.
    git push
    ```
 
-3. **Create and push a tag**:
-   ```bash
-   git tag v2.0.1
-   git push origin v2.0.1
-   ```
+3. **Merge to `master`**. The `publish.yml` workflow runs on every push to
+   `master` (and can also be run manually via "Run workflow"). If the version in
+   `server-new/package.json` is already on npm, the workflow skips publishing,
+   so bump the version in any merge you want released.
 
-4. **GitHub Actions will automatically**:
+4. **GitHub Actions will automatically** (when the version is new):
    - Build the client
    - Prepare the package
    - Publish to npm
@@ -174,8 +173,9 @@ The GitHub Actions workflows:
 - Tests server start
 - Builds Docker image
 
-### `publish.yml` (Tagged Releases)
-- Runs on version tags (v*)
+### `publish.yml` (Merges to master)
+- Runs on every push to `master` or manually
+- Skips if the version is already published to npm
 - Builds everything
 - Publishes to npm
 - Creates GitHub release
