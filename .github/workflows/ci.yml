@@ -17,11 +17,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies (server)
         run: |
-          cd server-new
+          cd server
           npm ci
 
       - name: Install dependencies (client)
@@ -36,7 +36,7 @@ jobs:
 
       - name: Test server start
         run: |
-          cd server-new
+          cd server
           timeout 5 node index.js || exit 0
 
   docker:
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd server-new && npm ci
+          cd server && npm ci
           cd ../client && npm ci
 
       - name: Build client

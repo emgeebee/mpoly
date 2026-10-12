@@ -1,104 +1,291 @@
-var MPDClient = module.exports.MPDClient = require('./lib/client.js')
-  , shoe = require('shoe')
-  , net;
+import express from 'express';
+import { WebSocketServer } from 'ws';
+import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { MPDClient } from './mpd-client.js';
 
-try { net = require('net'); } catch(e) {}
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-//
-// Convenience method for connecting to an MPD
-// server and getting a client instance in return.
-//
-module.exports.createConnection = function(port, host, callback) {
-    var client = new MPDClient()
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-    if (typeof port === 'function') {
-        callback = port;
-        port = 6600;
-        host = 'localhost';
-    } else
-    if (typeof host === 'function') {
-        callback = host;
-        host = 'localhost';
-    } else {
-        port = port || 6600;
-        host = host || 'localhost';
-        callback = callback || function(){};
-    }
-    console.log(port, host)
+// MPD configuration from environment
+const MPD_HOST = process.env.MPD_HOST || 'localhost';
+const MPD_PORT = process.env.MPD_PORT || 6600;
 
-    if(+port != +port) { // port is NaN, i.e. path
-        client.connect(port);
-    } else {
-        client.connect(+port, host);
-    }
-    client.once('ready', function() {
-        process.nextTick(function(){
-            callback(null, client);
-        });
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Built React app: ./client/dist in the npm package, ../client/dist in Docker and the repo
+const clientBuildPath = [
+  path.join(__dirname, 'client/dist'),
+  path.join(__dirname, '../client/dist')
+].find((dir) => fs.existsSync(path.join(dir, 'index.html')));
+
+if (clientBuildPath) {
+  app.use(express.static(clientBuildPath));
+}
+
+// MPD client instance
+let mpdClient = null;
+let reconnectInterval = null;
+
+// Connect to MPD
+async function connectToMPD() {
+  try {
+    mpdClient = new MPDClient();
+    await mpdClient.connect(MPD_HOST, MPD_PORT);
+    
+    // Broadcast to all WebSocket clients when MPD state changes
+    mpdClient.on('changed', async (subsystem) => {
+      console.log(`MPD changed: ${subsystem}`);
+      
+      // Broadcast the change to all connected clients
+      const data = await getFullState();
+      broadcast({ type: 'update', subsystem, data });
     });
 
-    // Throw error if the connection fails
-    client.on('error', function(){
-	    process.nextTick(function(){
-			callback('connection-error', client); 
-	    });
+    mpdClient.on('disconnected', () => {
+      console.log('MPD disconnected, will try to reconnect...');
+      broadcast({ type: 'disconnected' });
+      scheduleReconnect();
     });
 
-    return client;
-};
+    // Clear any existing reconnect interval
+    if (reconnectInterval) {
+      clearInterval(reconnectInterval);
+      reconnectInterval = null;
+    }
 
-module.exports.createStream = function() {
-    return new MPDClient();
-};
+    console.log('MPD client initialized');
+    return true;
+  } catch (error) {
+    console.error('Failed to connect to MPD:', error.message);
+    scheduleReconnect();
+    return false;
+  }
+}
 
-module.exports.createConnection = MPDClient.prototype.connect ?
-    module.exports.createConnection :
-    function (uri, callback) {
-        var client = new MPDClient()
-          , uri = uri || '/komponist'
-          , callback = callback || function(){};
+function scheduleReconnect() {
+  if (!reconnectInterval) {
+    reconnectInterval = setInterval(async () => {
+      console.log('Attempting to reconnect to MPD...');
+      const connected = await connectToMPD();
+      if (connected && reconnectInterval) {
+        clearInterval(reconnectInterval);
+        reconnectInterval = null;
+      }
+    }, 5000);
+  }
+}
 
-        if (typeof uri === 'function') {
-            callback = uri;
-            uri = '/komponist';
-        }
+// Get full MPD state
+async function getFullState() {
+  if (!mpdClient || !mpdClient.connected) {
+    return { connected: false };
+  }
 
-        client.once('ready', function() {
-            callback(null, client);
-        });
+  try {
+    const [status, currentSong, playlist] = await Promise.all([
+      mpdClient.status(),
+      mpdClient.currentSong(),
+      mpdClient.playlist()
+    ]);
 
-        // Throw error if the connection fails
-        client.on('error', function(){
-	    	callback('connection-error', client); 
-        });
-
-        return shoe(uri).pipe(client);
+    return {
+      connected: true,
+      status,
+      currentSong,
+      playlist: Array.isArray(playlist) ? playlist : (playlist ? [playlist] : [])
     };
+  } catch (error) {
+    console.error('Error getting MPD state:', error);
+    return { connected: false, error: error.message };
+  }
+}
 
-//
-// Simple wrapper function for piping content between `shoe`
-// and the browser:
-//
-module.exports.install = function(server, port, host, uri) {
-    if (!net) throw new Error('install is a server-side only method');
+// REST API Endpoints
 
-    var uri = uri || '/komponist'
-      , host = host || 'localhost'
-      , port = port || 6600;
+app.get('/api/status', async (req, res) => {
+  try {
+    const state = await getFullState();
+    res.json(state);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    var sock = shoe(function(stream) {
-        var client = net.createConnection(host, port)
+app.post('/api/play', async (req, res) => {
+  try {
+    const { pos } = req.body;
+    await mpdClient.play(pos);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-        client.pipe(stream);
+app.post('/api/pause', async (req, res) => {
+  try {
+    await mpdClient.pause();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-        stream.on('data', function(data) {
-            client.write(data);
-        });
+app.post('/api/stop', async (req, res) => {
+  try {
+    await mpdClient.stop();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-        client.on('error', function(err) {
-            console.log(err);
-        });
-    });
+app.post('/api/next', async (req, res) => {
+  try {
+    await mpdClient.next();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    sock.install(server, uri);
-};
+app.post('/api/previous', async (req, res) => {
+  try {
+    await mpdClient.previous();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/clear', async (req, res) => {
+  try {
+    await mpdClient.clear();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/add', async (req, res) => {
+  try {
+    const { uri } = req.body;
+    await mpdClient.add(uri);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/delete', async (req, res) => {
+  try {
+    const { pos } = req.body;
+    await mpdClient.delete(pos);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/browse', async (req, res) => {
+  try {
+    const { path = '' } = req.query;
+    const items = await mpdClient.lsinfo(path);
+    res.json({ items: Array.isArray(items) ? items : (items ? [items] : []) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/update', async (req, res) => {
+  try {
+    await mpdClient.update();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/volume', async (req, res) => {
+  try {
+    const { volume } = req.body;
+    await mpdClient.setVolume(volume);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/seek', async (req, res) => {
+  try {
+    const { pos, time } = req.body;
+    await mpdClient.seek(pos, time);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Serve React app for all other routes
+if (clientBuildPath) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
+
+// Start HTTP server
+const server = app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
+  await connectToMPD();
+});
+
+// WebSocket server
+const wss = new WebSocketServer({ server });
+
+const clients = new Set();
+
+function broadcast(message) {
+  const data = JSON.stringify(message);
+  clients.forEach(client => {
+    if (client.readyState === 1) { // OPEN
+      client.send(data);
+    }
+  });
+}
+
+wss.on('connection', async (ws) => {
+  console.log('WebSocket client connected');
+  clients.add(ws);
+
+  // Send initial state
+  const state = await getFullState();
+  ws.send(JSON.stringify({ type: 'initial', data: state }));
+
+  ws.on('close', () => {
+    console.log('WebSocket client disconnected');
+    clients.delete(ws);
+  });
+
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+    clients.delete(ws);
+  });
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  if (mpdClient) {
+    mpdClient.disconnect();
+  }
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});

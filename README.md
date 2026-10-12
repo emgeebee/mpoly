@@ -37,8 +37,6 @@ All configuration is through environment variables:
 | `MPD_PORT` | `6600`      | MPD server port       |
 | `PORT`     | `3001`      | HTTP / WebSocket port |
 
-For development, these can go in `server-new/.env`.
-
 ## Synology / Docker
 
 ### Synology (npx, no image build)
@@ -48,7 +46,7 @@ See [`docker/synology-compose.yml`](docker/synology-compose.yml). In Container M
 The container runs:
 
 ```bash
-npx --yes @emgeebee/mpoly@2.0.2
+npx --yes @emgeebee/mpoly@2.1.0
 ```
 
 To upgrade, change the version in the compose file and rebuild the project.
@@ -73,7 +71,7 @@ MPD_HOST=192.168.1.50 docker compose up --build
 ```bash
 npm install            # root tooling (npm-run-all)
 npm run install:all    # server + client dependencies
-npm run dev            # server on :3001, Vite dev server on :3000
+MPD_HOST=192.168.1.50 npm run dev   # server on :3001, Vite dev server on :3000
 ```
 
 Open `http://localhost:3000`. Vite proxies `/api` and `/ws` to the server, so hot reload works against a real MPD.
@@ -121,7 +119,7 @@ Connect to `ws://<host>:<port>/ws`. Messages:
 
 ```
 .
-├── server-new/              # Node.js server (Express + ws)
+├── server/                  # Node.js server (Express + ws)
 │   ├── index.js             # REST API, WebSocket, static UI
 │   └── mpd-client.js        # MPD TCP client
 ├── client/                  # React SPA (Vite)
@@ -136,11 +134,9 @@ Connect to `ws://<host>:<port>/ws`. Messages:
 └── docker-compose.yml
 ```
 
-The rest of the repo (`src/`, `server/`, `main.ts`, `e2e/`, etc.) is the old Electron + Angular app; see [MIGRATION.md](MIGRATION.md).
-
 ## Publishing
 
-Every push to `master` publishes to npm if the version in `server-new/package.json` isn't already published. See [PUBLISHING.md](PUBLISHING.md).
+Every push to `master` publishes to npm if the version in `server/package.json` isn't already published. See [PUBLISHING.md](PUBLISHING.md).
 
 ## License
 

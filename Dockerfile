@@ -1,10 +1,10 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
 # Copy server files
-COPY server-new/package*.json ./server/
-COPY server-new/*.js ./server/
+COPY server/package*.json ./server/
+COPY server/*.js ./server/
 
 # Copy client build files (built separately)
 COPY client/dist ./client/dist
