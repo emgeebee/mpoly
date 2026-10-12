@@ -1,6 +1,7 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { MPDClient } from './mpd-client.js';
@@ -18,9 +19,13 @@ const MPD_PORT = process.env.MPD_PORT || 6600;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from React app in production
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '../client/dist');
+// Built React app: ./client/dist in the npm package, ../client/dist in Docker and the repo
+const clientBuildPath = [
+  path.join(__dirname, 'client/dist'),
+  path.join(__dirname, '../client/dist')
+].find((dir) => fs.existsSync(path.join(dir, 'index.html')));
+
+if (clientBuildPath) {
   app.use(express.static(clientBuildPath));
 }
 
@@ -227,10 +232,10 @@ app.post('/api/seek', async (req, res) => {
   }
 });
 
-// Serve React app for all other routes in production
-if (process.env.NODE_ENV === 'production') {
+// Serve React app for all other routes
+if (clientBuildPath) {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 }
 

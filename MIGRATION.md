@@ -39,7 +39,7 @@ PORT=3001
 **client/.env** (optional, for custom backend URL)
 ```
 VITE_API_URL=http://your-server:3001
-VITE_WS_URL=ws://your-server:3001
+VITE_WS_URL=ws://your-server:3001/ws
 ```
 
 ### 3. Development Workflow
@@ -113,7 +113,7 @@ fetch('/api/browse?path=' + path)
 
 **New:** WebSocket connection
 ```javascript
-const ws = new WebSocket('ws://localhost:3001');
+const ws = new WebSocket(`ws://${location.host}/ws`);
 ws.onmessage = (event) => {
   const message = JSON.parse(event.data);
   // Handle updates
@@ -179,10 +179,10 @@ Keep these if you want to maintain backwards compatibility:
 
 If you need to rollback:
 
-1. The old code is still in the repository
-2. Switch branches: `git checkout master`
+1. The old code is still in the repository (`src/`, `server/`, `main.ts`)
+2. Check out a commit from before the migration
 3. Run old app: `npm install && npm start`
 
 ## Questions?
 
-Check README-NEW.md for detailed documentation on the new architecture.
+Check [README.md](README.md) for detailed documentation on the new architecture.

@@ -1,199 +1,78 @@
-# Publishing to NPM
+# Publishing to npm
 
-This document explains how to publish MPoly to npm.
+MPoly is published as [`@emgeebee/mpoly`](https://www.npmjs.com/package/@emgeebee/mpoly).
 
-## Prerequisites
+## How releases happen
 
-1. **NPM Account**: You need an npm account with publishing permissions
-2. **NPM Token**: Add `NPM_TOKEN` to GitHub repository secrets
-3. **Version**: Update version in `server-new/package.json`
+[`.github/workflows/publish.yml`](.github/workflows/publish.yml) runs on every push to `master` (and can be run manually via **Run workflow**). It:
 
-## Publishing Process
+1. Reads the version from `server-new/package.json`
+2. Skips everything if `@emgeebee/mpoly@<version>` is already on npm
+3. Builds the client
+4. Assembles `dist/` (server files, `client/dist`, `README.md`, `LICENSE`)
+5. Runs [`scripts/prepare-publish.js`](scripts/prepare-publish.js) to write the published `package.json` and `bin/mpoly.js`
+6. Publishes to npm and creates a `v<version>` GitHub release
 
-### Automatic Publishing (Recommended)
-
-1. **Update version** in `server-new/package.json`:
-   ```bash
-   cd server-new
-   # Update version: 2.0.0 -> 2.0.1, 2.1.0, 3.0.0, etc.
-   ```
-
-2. **Commit changes**:
-   ```bash
-   git add server-new/package.json
-   git commit -m "chore: bump version to 2.0.1"
-   git push
-   ```
-
-3. **Merge to `master`**. The `publish.yml` workflow runs on every push to
-   `master` (and can also be run manually via "Run workflow"). If the version in
-   `server-new/package.json` is already on npm, the workflow skips publishing,
-   so bump the version in any merge you want released.
-
-4. **GitHub Actions will automatically** (when the version is new):
-   - Build the client
-   - Prepare the package
-   - Publish to npm
-   - Create a GitHub release
-
-### Manual Publishing
-
-If you need to publish manually:
+So to release, bump the version and push to `master`:
 
 ```bash
-# Build client
-cd client
-npm install
-npm run build
+cd server-new
+npm version patch --no-git-tag-version   # or minor / major
 cd ..
-
-# Prepare distribution
-mkdir -p dist
-cp -r server-new/* dist/
-mkdir -p dist/client
-cp -r client/dist dist/client/
-cp README-NEW.md dist/README.md
-cp LICENSE dist/
-
-# Prepare package.json
-node scripts/prepare-publish.js
-
-# Publish
-cd dist
-npm login
-npm publish --access public
+npm pkg set version=$(node -p "require('./server-new/package.json').version")
+git commit -am "chore: bump version to X.Y.Z"
+git push origin master
 ```
 
-## Package Configuration
+The root `package.json` version is kept in step for consistency, but only `server-new/package.json` drives publishing.
 
-The published package includes:
+If you're releasing a version the Synology compose file should use, update the pinned version in [`docker/synology-compose.yml`](docker/synology-compose.yml) and the README.
+
+## Authentication: npm trusted publishing
+
+The workflow authenticates with [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC), so there's no `NPM_TOKEN` secret. It's configured on npmjs.com under the package settings for `@emgeebee/mpoly`:
+
+- Publisher: GitHub Actions
+- Repository: `emgeebee/mpoly`
+- Workflow: `publish.yml`
+
+Trusted publishing needs npm 11.5.1+, so the workflow runs on Node 24 and upgrades npm before publishing. Provenance is attached automatically.
+
+## Published package layout
 
 ```
-mpoly/
-├── index.js           # Server entry point
-├── mpd-client.js      # MPD client library
-├── client/            # Built React app
-│   └── dist/
-├── bin/
-│   └── mpoly.js       # CLI executable
+@emgeebee/mpoly/
+├── index.js           # server entry point
+├── mpd-client.js      # MPD client
+├── client/dist/       # built React app (served by index.js)
+├── bin/mpoly.js       # `mpoly` executable
 ├── package.json
 ├── README.md
 └── LICENSE
 ```
 
-## Usage After Publishing
-
-Users can install and run:
+## Testing the package locally
 
 ```bash
-# Run directly with npx
-npx mpoly
-
-# Or install globally
-npm install -g mpoly
-mpoly
-
-# Or install locally
-npm install mpoly
-node node_modules/mpoly/index.js
-```
-
-## Environment Variables
-
-Users can configure via environment variables:
-
-```bash
-MPD_HOST=192.168.1.100 MPD_PORT=6600 PORT=8080 npx mpoly
-```
-
-## Version Numbering
-
-Follow semantic versioning:
-
-- **Major** (3.0.0): Breaking changes
-- **Minor** (2.1.0): New features, backwards compatible
-- **Patch** (2.0.1): Bug fixes
-
-## GitHub Secrets Setup
-
-Add to repository secrets (Settings → Secrets and variables → Actions):
-
-1. **NPM_TOKEN**: Your npm access token
-   - Create at: https://www.npmjs.com/settings/[username]/tokens
-   - Type: Automation or Publish
-   - Scope: Read and write
-
-## Testing Before Publishing
-
-Test the build pipeline:
-
-```bash
-# Run CI checks
-npm run build
-
-# Test Docker build
-npm run docker:build
-
-# Test package creation
+cd client && npm ci && npm run build && cd ..
+rm -rf dist && mkdir -p dist/client
+cp -r server-new/* dist/
+cp -r client/dist dist/client/
+cp README.md LICENSE dist/
 node scripts/prepare-publish.js
 
-# Test the packaged version
 cd dist
 npm install
-node index.js
+MPD_HOST=192.168.1.50 node bin/mpoly.js   # UI on http://localhost:3001
+npm pack --dry-run                        # inspect the tarball contents
 ```
 
 ## Troubleshooting
 
-### "403 Forbidden" Error
+- **`ENEEDAUTH` / `401` / `403`**: the trusted publisher on npmjs.com doesn't match the repo or workflow file name, or npm on the runner is older than 11.5.1.
+- **`EPUBLISHCONFLICT`**: the version is already published. Bump it; npm never allows republishing a version.
+- **Workflow ran but nothing published**: the version wasn't bumped. Check the "Determine version and check npm" step output.
 
-- Check NPM_TOKEN in GitHub secrets
-- Verify npm account has publishing permissions
-- Check package name isn't taken
+## CI
 
-### "EPUBLISHCONFLICT" Error
-
-- Version already published
-- Increment version number
-- Cannot republish same version
-
-### Build Failures
-
-- Check Node.js version (requires 18+)
-- Verify all dependencies install correctly
-- Check client build succeeds
-
-## CI/CD Pipeline
-
-The GitHub Actions workflows:
-
-### `ci.yml` (Pull Requests & Pushes)
-- Runs on every push/PR
-- Builds client
-- Tests server start
-- Builds Docker image
-
-### `publish.yml` (Merges to master)
-- Runs on every push to `master` or manually
-- Skips if the version is already published to npm
-- Builds everything
-- Publishes to npm
-- Creates GitHub release
-
-## Package Info
-
-Published package info:
-- **Name**: `mpoly`
-- **Registry**: https://www.npmjs.com/package/mpoly
-- **Executable**: `mpoly` (via bin)
-- **Type**: ESM module
-
-## Unpublishing
-
-To unpublish (within 72 hours):
-
-```bash
-npm unpublish mpoly@2.0.1
-```
-
-After 72 hours, contact npm support.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on pushes and PRs to `master`/`main`: installs and builds the client, smoke-tests the server start, and builds and runs the Docker image.

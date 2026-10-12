@@ -6,7 +6,8 @@ import Playlist from './components/Playlist';
 import Browser from './components/Browser';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
-const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:3001`;
+const WS_URL = import.meta.env.VITE_WS_URL ||
+  `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
 
 function App() {
   const [state, setState] = useState({

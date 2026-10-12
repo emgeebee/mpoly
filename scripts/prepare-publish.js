@@ -26,7 +26,7 @@ const publishPkg = {
   },
   scripts: {
     start: 'node index.js',
-    postinstall: 'echo "MPoly installed! Run with: npx mpoly"'
+    postinstall: 'echo "MPoly installed! Run with: npx @emgeebee/mpoly"'
   },
   keywords: [
     'mpd',
@@ -76,7 +76,7 @@ const binScript = `#!/usr/bin/env node
 
 /**
  * MPoly - MPD Client Server
- * Run with: npx mpoly
+ * Run with: npx @emgeebee/mpoly
  */
 
 import { fileURLToPath } from 'url';

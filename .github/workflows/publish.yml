@@ -73,7 +73,7 @@ jobs:
           cp -r client/dist dist/client/
           
           # Copy essential files
-          cp README-NEW.md dist/README.md
+          cp README.md dist/README.md
           cp LICENSE dist/ 2>/dev/null || echo "No LICENSE file"
           
           # Update package.json for publishing
