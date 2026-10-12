@@ -6,7 +6,7 @@ MPoly is published as [`@emgeebee/mpoly`](https://www.npmjs.com/package/@emgeebe
 
 [`.github/workflows/publish.yml`](.github/workflows/publish.yml) runs on every push to `master` (and can be run manually via **Run workflow**). It:
 
-1. Reads the version from `server-new/package.json`
+1. Reads the version from `server/package.json`
 2. Skips everything if `@emgeebee/mpoly@<version>` is already on npm
 3. Builds the client
 4. Assembles `dist/` (server files, `client/dist`, `README.md`, `LICENSE`)
@@ -16,15 +16,15 @@ MPoly is published as [`@emgeebee/mpoly`](https://www.npmjs.com/package/@emgeebe
 So to release, bump the version and push to `master`:
 
 ```bash
-cd server-new
+cd server
 npm version patch --no-git-tag-version   # or minor / major
 cd ..
-npm pkg set version=$(node -p "require('./server-new/package.json').version")
+npm pkg set version=$(node -p "require('./server/package.json').version")
 git commit -am "chore: bump version to X.Y.Z"
 git push origin master
 ```
 
-The root `package.json` version is kept in step for consistency, but only `server-new/package.json` drives publishing.
+The root `package.json` version is kept in step for consistency, but only `server/package.json` drives publishing.
 
 If you're releasing a version the Synology compose file should use, update the pinned version in [`docker/synology-compose.yml`](docker/synology-compose.yml) and the README.
 
@@ -56,7 +56,7 @@ Trusted publishing needs npm 11.5.1+, so the workflow runs on Node 24 and upgrad
 ```bash
 cd client && npm ci && npm run build && cd ..
 rm -rf dist && mkdir -p dist/client
-cp -r server-new/* dist/
+cp -r server/* dist/
 cp -r client/dist dist/client/
 cp README.md LICENSE dist/
 node scripts/prepare-publish.js

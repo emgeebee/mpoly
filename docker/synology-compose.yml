@@ -29,4 +29,4 @@ services:
       - -c
       - |
         rm -rf /root/.npm/_npx 2>/dev/null || true
-        exec npx --yes @emgeebee/mpoly@2.0.2
+        exec npx --yes @emgeebee/mpoly@2.1.0

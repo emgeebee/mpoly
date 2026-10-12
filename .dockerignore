@@ -5,7 +5,6 @@ npm-debug.log
 .git
 .gitignore
 README.md
-MIGRATION.md
 PUBLISHING.md
 .vscode
 .idea
@@ -14,4 +13,4 @@ PUBLISHING.md
 .github
 dist
 client/node_modules
-server-new/node_modules
+server/node_modules

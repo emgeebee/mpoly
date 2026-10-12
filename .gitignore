@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Keep package-lock.json for new architecture
-!server-new/package-lock.json
+!server/package-lock.json
 !client/package-lock.json
 
 # Build outputs
@@ -29,6 +29,3 @@ build/
 .DS_Store
 Thumbs.db
 
-# Old build artifacts
-main.js
-ext/komponist.compiled.js

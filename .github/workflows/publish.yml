@@ -32,7 +32,7 @@ jobs:
       - name: Determine version and check npm
         id: version
         run: |
-          VERSION=$(node -p "require('./server-new/package.json').version")
+          VERSION=$(node -p "require('./server/package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if npm view "@emgeebee/mpoly@$VERSION" version >/dev/null 2>&1; then
             echo "@emgeebee/mpoly@$VERSION is already published; skipping."
@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies (server)
         if: steps.version.outputs.publish == 'true'
         run: |
-          cd server-new
+          cd server
           npm ci
 
       - name: Install dependencies (client)
@@ -66,7 +66,7 @@ jobs:
           mkdir -p dist
           
           # Copy server files
-          cp -r server-new/* dist/
+          cp -r server/* dist/
           
           # Copy built client to dist
           mkdir -p dist/client
