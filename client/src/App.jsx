@@ -161,7 +161,10 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>MPoly</h1>
+        <div className="header-left">
+          <h1>MPoly</h1>
+          <span className="version">v{__APP_VERSION__}</span>
+        </div>
         <div
           className={`status ${state.connected ? 'connected' : 'disconnected'}`}
           title={state.error || ''}
