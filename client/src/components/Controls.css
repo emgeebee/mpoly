@@ -2,27 +2,43 @@
   background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
   border: 2px solid;
   border-color: #5a5a5a #000000 #000000 #5a5a5a;
-  padding: 1rem;
+  padding: 0.6rem;
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
   box-shadow: inset 0 1px 0 #5a5a5a, 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.controls-main {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls-secondary {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  background: #000000;
+  border: 1px solid;
+  border-color: #000000 #404040 #404040 #000000;
+}
+
 .control-btn {
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 0.8rem;
   background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
   color: #00ff00;
   border: 2px solid;
   border-color: #5a5a5a #000000 #000000 #5a5a5a;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   transition: all 0.1s ease;
   text-shadow: 0 0 5px #00ff00;
   box-shadow: inset 0 1px 0 #5a5a5a;
+  min-width: 40px;
 }
 
 .control-btn:hover {
@@ -40,8 +56,8 @@
 .control-btn.primary {
   background: linear-gradient(180deg, #006600 0%, #003300 100%);
   color: #00ff00;
-  font-size: 1rem;
-  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem;
+  padding: 0.6rem 1.2rem;
   border-color: #009900 #003300 #003300 #009900;
   box-shadow: inset 0 1px 0 #009900, 0 0 15px rgba(0, 255, 0, 0.5);
 }
@@ -49,4 +65,84 @@
 .control-btn.primary:hover {
   background: linear-gradient(180deg, #008800 0%, #004400 100%);
   box-shadow: inset 0 1px 0 #00aa00, 0 0 20px rgba(0, 255, 0, 0.7);
+}
+
+.control-btn-small {
+  padding: 0.3rem 0.5rem;
+  background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+  color: #009900;
+  border: 1px solid;
+  border-color: #4a4a4a #000000 #000000 #4a4a4a;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.1s ease;
+  text-shadow: 0 0 3px #009900;
+  box-shadow: inset 0 1px 0 #4a4a4a;
+}
+
+.control-btn-small:hover {
+  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+  color: #00cc00;
+}
+
+.control-btn-small.active {
+  background: linear-gradient(180deg, #005500 0%, #003300 100%);
+  color: #00ff00;
+  border-color: #007700 #002200 #002200 #007700;
+  box-shadow: inset 0 1px 0 #007700, 0 0 10px rgba(0, 255, 0, 0.5);
+  text-shadow: 0 0 8px #00ff00;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.volume-icon {
+  font-size: 1rem;
+  filter: grayscale(1) brightness(1.5);
+}
+
+.volume-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #1a1a1a;
+  outline: none;
+  border: 1px solid #404040;
+  border-radius: 0;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+  cursor: pointer;
+  border: 1px solid #00ff00;
+  box-shadow: 0 0 5px #00ff00;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+  cursor: pointer;
+  border: 1px solid #00ff00;
+  box-shadow: 0 0 5px #00ff00;
+  border-radius: 0;
+}
+
+.volume-label {
+  font-size: 0.7rem;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-shadow: 0 0 5px #00ff00;
+  min-width: 35px;
+  text-align: right;
 }

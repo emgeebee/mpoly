@@ -270,6 +270,35 @@ app.post('/api/seek', async (req, res) => {
   }
 });
 
+app.post('/api/shuffle', async (req, res) => {
+  try {
+    await mpdClient.shuffle();
+    res.json({ success: true });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+app.post('/api/repeat', async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    await mpdClient.repeat(enabled);
+    res.json({ success: true });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+app.post('/api/random', async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    await mpdClient.random(enabled);
+    res.json({ success: true });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // Serve React app for all other routes
 if (clientBuildPath) {
   app.get('*', (req, res) => {

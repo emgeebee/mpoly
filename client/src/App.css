@@ -16,6 +16,12 @@
   box-shadow: inset 0 1px 0 #5a5a5a;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .app-header h1 {
   font-size: 1rem;
   font-weight: bold;
@@ -23,6 +29,14 @@
   text-shadow: 0 0 5px #00ff00;
   letter-spacing: 2px;
   text-transform: uppercase;
+}
+
+.version {
+  font-size: 0.7rem;
+  color: #009900;
+  font-family: 'Courier New', monospace;
+  font-weight: normal;
+  text-shadow: 0 0 3px #009900;
 }
 
 .status {
@@ -56,13 +70,19 @@
 
 .app-content {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 1600px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  max-width: 800px;
   width: 100%;
   margin: 0 auto;
+}
+
+.bottom-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 }
 
 .main-section {
@@ -77,8 +97,18 @@
   gap: 1rem;
 }
 
-@media (max-width: 1024px) {
-  .app-content {
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 820px) {
+  .bottom-section {
     grid-template-columns: 1fr;
+  }
+  
+  .app-content {
+    padding: 0.3rem;
+    gap: 0.3rem;
   }
 }

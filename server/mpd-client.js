@@ -240,6 +240,18 @@ export class MPDClient extends EventEmitter {
     return this.command('seek', [pos, time]);
   }
 
+  async shuffle() {
+    return this.command('shuffle');
+  }
+
+  async repeat(state) {
+    return this.command('repeat', [state ? 1 : 0]);
+  }
+
+  async random(state) {
+    return this.command('random', [state ? 1 : 0]);
+  }
+
   disconnect() {
     if (this.socket) {
       this.removeAllListeners();
