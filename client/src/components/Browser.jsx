@@ -34,6 +34,12 @@ function Browser({ api, connected }) {
     }
   };
 
+  const handleAddFolder = (directory) => {
+    if (window.confirm(`Add all tracks from "${directory.split('/').pop()}" to playlist?`)) {
+      api.add(directory);
+    }
+  };
+
   const goUp = () => {
     const parts = currentPath.split('/').filter(Boolean);
     parts.pop();
@@ -77,15 +83,28 @@ function Browser({ api, connected }) {
             <div 
               key={index}
               className={`browser-item ${item.directory ? 'directory' : 'file'}`}
-              onClick={() => handleItemClick(item)}
             >
-              <span className="item-icon">
-                {item.directory ? '📁' : '🎵'}
-              </span>
-              <span className="item-name">
-                {item.directory ? item.directory.split('/').pop() : 
-                 item.title || item.file?.split('/').pop() || 'Unknown'}
-              </span>
+              <div className="item-content" onClick={() => handleItemClick(item)}>
+                <span className="item-icon">
+                  {item.directory ? '📁' : '🎵'}
+                </span>
+                <span className="item-name">
+                  {item.directory ? item.directory.split('/').pop() : 
+                   item.title || item.file?.split('/').pop() || 'Unknown'}
+                </span>
+              </div>
+              {item.directory && (
+                <button 
+                  className="btn-add-folder"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddFolder(item.directory);
+                  }}
+                  title="Add entire folder to playlist"
+                >
+                  +
+                </button>
+              )}
             </div>
           ))
         )}

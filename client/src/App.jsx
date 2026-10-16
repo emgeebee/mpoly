@@ -135,6 +135,23 @@ function App() {
         body: JSON.stringify({ pos, time })
       });
     },
+    shuffle: async () => {
+      await fetch(`${API_BASE}/api/shuffle`, { method: 'POST' });
+    },
+    repeat: async (enabled) => {
+      await fetch(`${API_BASE}/api/repeat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled })
+      });
+    },
+    random: async (enabled) => {
+      await fetch(`${API_BASE}/api/random`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled })
+      });
+    },
     browse: async (path = '') => {
       const response = await fetch(`${API_BASE}/api/browse?path=${encodeURIComponent(path)}`);
       return response.json();
@@ -156,24 +173,22 @@ function App() {
       </header>
 
       <div className="app-content">
-        <div className="main-section">
-          <NowPlaying 
-            currentSong={state.currentSong} 
-            status={state.status}
-          />
-          <Controls 
-            status={state.status} 
-            api={api}
-          />
-        </div>
-
-        <div className="secondary-section">
+        <NowPlaying 
+          currentSong={state.currentSong} 
+          status={state.status}
+        />
+        <Controls 
+          status={state.status} 
+          api={api}
+        />
+        
+        <div className="bottom-section">
+          <Browser api={api} connected={state.connected} />
           <Playlist 
             playlist={state.playlist || []} 
             status={state.status}
             api={api}
           />
-          <Browser api={api} connected={state.connected} />
         </div>
       </div>
     </div>

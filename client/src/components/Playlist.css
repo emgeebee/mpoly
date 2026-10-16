@@ -2,41 +2,42 @@
   background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
   border: 2px solid;
   border-color: #5a5a5a #000000 #000000 #5a5a5a;
-  padding: 0.8rem;
+  padding: 0.6rem;
   box-shadow: inset 0 1px 0 #5a5a5a, 0 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  max-height: 600px;
+  max-height: 400px;
 }
 
 .playlist-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.8rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
   border-bottom: 1px solid #404040;
 }
 
 .playlist-header h2 {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #00ff00;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   font-weight: bold;
   text-shadow: 0 0 5px #00ff00;
+  font-family: 'Courier New', monospace;
 }
 
 .btn-clear {
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.6rem;
   background: linear-gradient(180deg, #660000 0%, #330000 100%);
   color: #ff0000;
   border: 2px solid;
   border-color: #990000 #330000 #330000 #990000;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   transition: all 0.1s ease;
   text-shadow: 0 0 5px #ff0000;
   box-shadow: inset 0 1px 0 #990000;
@@ -78,16 +79,16 @@
 .empty-playlist {
   text-align: center;
   color: #006600;
-  padding: 2rem;
-  font-family: 'WinampDigital', monospace;
-  font-size: 0.9rem;
+  padding: 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
 }
 
 .playlist-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0.5rem;
+  padding: 0.3rem 0.4rem;
   margin-bottom: 1px;
   background: #000000;
   transition: all 0.1s ease;
@@ -108,23 +109,24 @@
 .playlist-item-info {
   flex: 1;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .playlist-item-title {
   font-weight: bold;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.1rem;
   color: #00ff00;
-  font-size: 0.85rem;
-  font-family: 'WinampDigital', monospace;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .playlist-item-meta {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: #009900;
-  font-family: 'WinampDigital', monospace;
+  font-family: 'Courier New', monospace;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
