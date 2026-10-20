@@ -83,6 +83,12 @@
   overflow: hidden;
   margin-bottom: 0.4rem;
   position: relative;
+  cursor: pointer;
+}
+
+.progress-bar:hover {
+  border-color: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
 }
 
 .progress-fill {

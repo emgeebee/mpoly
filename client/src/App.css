@@ -77,12 +77,15 @@
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .bottom-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  flex: 1;
+  overflow: hidden;
 }
 
 .main-section {
