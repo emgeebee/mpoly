@@ -75,9 +75,16 @@ function App() {
     };
   }, []);
 
-  // Initial fetch
+  // Initial fetch and polling
   useEffect(() => {
     fetchState();
+    
+    // Poll server every 10 seconds
+    const pollInterval = setInterval(() => {
+      fetchState();
+    }, 10000);
+    
+    return () => clearInterval(pollInterval);
   }, [fetchState]);
 
   // API commands
@@ -179,6 +186,7 @@ function App() {
         <NowPlaying 
           currentSong={state.currentSong} 
           status={state.status}
+          api={api}
         />
         <Controls 
           status={state.status} 

@@ -6,12 +6,10 @@ function Controls({ status, api }) {
   const isPlaying = state === 'play';
   const [volume, setVolume] = useState(parseInt(status?.volume || 50));
   const [repeat, setRepeat] = useState(status?.repeat === '1');
-  const [random, setRandom] = useState(status?.random === '1');
 
   useEffect(() => {
     setVolume(parseInt(status?.volume || 50));
     setRepeat(status?.repeat === '1');
-    setRandom(status?.random === '1');
   }, [status]);
 
   const handleVolumeChange = (e) => {
@@ -24,12 +22,6 @@ function Controls({ status, api }) {
     const newRepeat = !repeat;
     setRepeat(newRepeat);
     api.repeat(newRepeat);
-  };
-
-  const toggleRandom = () => {
-    const newRandom = !random;
-    setRandom(newRandom);
-    api.random(newRandom);
   };
 
   return (
@@ -73,14 +65,6 @@ function Controls({ status, api }) {
           title="Repeat"
         >
           🔁
-        </button>
-        
-        <button 
-          onClick={toggleRandom} 
-          className={`control-btn-small ${random ? 'active' : ''}`}
-          title="Random"
-        >
-          🎲
         </button>
         
         <div className="volume-control">
