@@ -84,6 +84,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .main-section {
