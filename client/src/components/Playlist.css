@@ -6,8 +6,7 @@
   box-shadow: inset 0 1px 0 #5a5a5a, 0 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  min-height: 400px;
-  height: 100%;
+  height: 400px;
 }
 
 .playlist-header {
@@ -89,6 +88,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.3rem;
   padding: 0.3rem 0.4rem;
   margin-bottom: 1px;
   background: #000000;
@@ -105,6 +105,38 @@
   background: #001a00;
   border-left: 2px solid #00ff00;
   box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.playlist-item-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex-shrink: 0;
+}
+
+.btn-move {
+  padding: 0.1rem 0.3rem;
+  background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+  color: #00ff00;
+  border: 1px solid;
+  border-color: #4a4a4a #000000 #000000 #4a4a4a;
+  font-size: 0.6rem;
+  transition: all 0.1s ease;
+  text-shadow: 0 0 3px #00ff00;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn-move:hover:not(:disabled) {
+  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.btn-move:disabled {
+  color: #003300;
+  text-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.3;
 }
 
 .playlist-item-info {

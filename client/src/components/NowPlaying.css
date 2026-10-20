@@ -9,7 +9,8 @@
 .display-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: 1rem;
   margin-bottom: 0.6rem;
   background: #000000;
   border: 1px solid;
@@ -24,12 +25,13 @@
   font-weight: bold;
   text-shadow: 0 0 10px #00ff00;
   letter-spacing: 2px;
+  flex-shrink: 0;
 }
 
 .audio-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.2rem;
   font-size: 0.7rem;
   color: #00ff00;
@@ -37,6 +39,7 @@
   text-transform: uppercase;
   font-weight: bold;
   text-shadow: 0 0 5px #00ff00;
+  flex-shrink: 0;
 }
 
 .bitrate, .samplerate, .channels {
@@ -44,12 +47,12 @@
 }
 
 .track-info-display {
-  background: #000000;
-  border: 1px solid;
-  border-color: #000000 #404040 #404040 #000000;
-  padding: 0.5rem;
-  margin-bottom: 0.6rem;
-  min-height: 3rem;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .track-title {
@@ -59,11 +62,14 @@
   text-shadow: 0 0 8px #00ff00;
   font-family: 'Courier New', monospace;
   letter-spacing: 1px;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .track-artist {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #00cc00;
   font-family: 'Courier New', monospace;
   overflow: hidden;

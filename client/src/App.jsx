@@ -125,6 +125,13 @@ function App() {
         body: JSON.stringify({ pos })
       });
     },
+    move: async (from, to) => {
+      await fetch(`${API_BASE}/api/move`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, to })
+      });
+    },
     update: async () => {
       await fetch(`${API_BASE}/api/update`, { method: 'POST' });
     },

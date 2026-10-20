@@ -74,15 +74,14 @@ function NowPlaying({ currentSong, status, api }) {
           {sampleRate && <span className="samplerate">{sampleRate} kHz</span>}
           <span className="channels">stereo</span>
         </div>
-      </div>
-      
-      <div className="track-info-display">
-        <marquee className="track-title" scrollamount="3">
-          {title}
-        </marquee>
-        {artist && (
-          <div className="track-artist">{artist}</div>
-        )}
+        <div className="track-info-display">
+          <div className="track-title">
+            {title}
+          </div>
+          {artist && (
+            <div className="track-artist">{artist}</div>
+          )}
+        </div>
       </div>
       
       <div className="progress-container">

@@ -231,6 +231,16 @@ app.post('/api/delete', async (req, res) => {
   }
 });
 
+app.post('/api/move', async (req, res) => {
+  try {
+    const { from, to } = req.body;
+    await mpdClient.move(from, to);
+    res.json({ success: true });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 app.get('/api/browse', async (req, res) => {
   try {
     const { path = '' } = req.query;
