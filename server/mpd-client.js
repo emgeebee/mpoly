@@ -224,6 +224,10 @@ export class MPDClient extends EventEmitter {
     return this.command('delete', [pos]);
   }
 
+  async move(from, to) {
+    return this.command('move', [from, to]);
+  }
+
   async lsinfo(path = '') {
     return this.command('lsinfo', path ? [path] : []);
   }
