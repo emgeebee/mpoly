@@ -1,6 +1,6 @@
 {
   "name": "@emgeebee/mpoly",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Modern MPD client with Node.js server and React SPA",
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
