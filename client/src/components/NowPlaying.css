@@ -4,6 +4,7 @@
   border-color: #5a5a5a #000000 #000000 #5a5a5a;
   padding: 0.6rem;
   box-shadow: inset 0 1px 0 #5a5a5a, 0 2px 4px rgba(0, 0, 0, 0.5);
+  min-width: 0;
 }
 
 .display-header {
@@ -16,6 +17,8 @@
   border: 1px solid;
   border-color: #000000 #404040 #404040 #000000;
   padding: 0.5rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .time-display-large {
@@ -63,22 +66,33 @@
   font-family: 'Courier New', monospace;
   letter-spacing: 1px;
   margin-bottom: 0.2rem;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .track-artist {
   font-size: 0.75rem;
   color: #00cc00;
   font-family: 'Courier New', monospace;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .progress-container {
   margin-top: 0.5rem;
+  min-width: 0;
 }
 
 .progress-bar {
@@ -118,4 +132,5 @@
   font-family: 'Courier New', monospace;
   font-weight: bold;
   text-shadow: 0 0 5px #00ff00;
+  min-width: 0;
 }

@@ -63,10 +63,16 @@ function Playlist({ playlist, status, api }) {
                 </button>
               </div>
               <div className="playlist-item-info" onClick={() => handlePlay(index)}>
-                <div className="playlist-item-title">
+                <div 
+                  className="playlist-item-title"
+                  title={track.title || track.file}
+                >
                   {track.title || track.file}
                 </div>
-                <div className="playlist-item-meta">
+                <div 
+                  className="playlist-item-meta"
+                  title={[track.artist, track.album].filter(Boolean).join(' - ')}
+                >
                   {track.artist && <span>{track.artist}</span>}
                   {track.album && <span> - {track.album}</span>}
                 </div>
@@ -77,6 +83,7 @@ function Playlist({ playlist, status, api }) {
                   handleDelete(index);
                 }}
                 className="btn-delete"
+                title="Remove from playlist"
               >
                 ✕
               </button>
