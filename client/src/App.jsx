@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import NowPlaying from './components/NowPlaying';
 import Controls from './components/Controls';
+import VolumeBar from './components/VolumeBar';
 import Playlist from './components/Playlist';
 import Browser from './components/Browser';
 
@@ -195,6 +196,10 @@ function App() {
           status={state.status}
           api={api}
         />
+
+        {/* Fixed volume bar: positioned between NowPlaying and Controls, always visible */}
+        <VolumeBar status={state.status} api={api} />
+
         <Controls 
           status={state.status} 
           api={api}
