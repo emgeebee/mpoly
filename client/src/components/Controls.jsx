@@ -4,19 +4,11 @@ import './Controls.css';
 function Controls({ status, api }) {
   const state = status?.state || 'stop';
   const isPlaying = state === 'play';
-  const [volume, setVolume] = useState(parseInt(status?.volume || 50));
   const [repeat, setRepeat] = useState(status?.repeat === '1');
 
   useEffect(() => {
-    setVolume(parseInt(status?.volume || 50));
     setRepeat(status?.repeat === '1');
   }, [status]);
-
-  const handleVolumeChange = (e) => {
-    const newVolume = parseInt(e.target.value);
-    setVolume(newVolume);
-    api.setVolume(newVolume);
-  };
 
   const toggleRepeat = () => {
     const newRepeat = !repeat;
@@ -61,25 +53,11 @@ function Controls({ status, api }) {
       <div className="controls-secondary">
         <button 
           onClick={toggleRepeat} 
-          className={`control-btn-small ${repeat ? 'active' : ''}`}
+          className={`control-btn ${repeat ? 'active' : ''}`}
           title="Repeat"
         >
           🔁
         </button>
-        
-        <div className="volume-control">
-          <span className="volume-icon">🔊</span>
-          <input 
-            type="range" 
-            min="0" 
-            max="100" 
-            value={volume}
-            onChange={handleVolumeChange}
-            className="volume-slider"
-            title={`Volume: ${volume}%`}
-          />
-          <span className="volume-label">{volume}%</span>
-        </div>
       </div>
     </div>
   );

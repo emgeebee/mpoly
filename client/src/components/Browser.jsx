@@ -50,6 +50,12 @@ function Browser({ api, connected }) {
     setCurrentPath('');
   };
 
+  const getItemName = (item) => {
+    return item.directory
+      ? item.directory.split('/').pop()
+      : item.title || item.file?.split('/').pop() || 'Unknown';
+  };
+
   return (
     <div className="browser">
       <div className="browser-header">
@@ -67,7 +73,7 @@ function Browser({ api, connected }) {
         </div>
       </div>
 
-      <div className="browser-path">
+      <div className="browser-path" title={currentPath || '/'}>
         {currentPath || '/'}
       </div>
 
@@ -88,9 +94,8 @@ function Browser({ api, connected }) {
                 <span className="item-icon">
                   {item.directory ? '📁' : '🎵'}
                 </span>
-                <span className="item-name">
-                  {item.directory ? item.directory.split('/').pop() : 
-                   item.title || item.file?.split('/').pop() || 'Unknown'}
+                <span className="item-name" title={getItemName(item)}>
+                  {getItemName(item)}
                 </span>
               </div>
               {item.directory && (
